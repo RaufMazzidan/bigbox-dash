@@ -5,58 +5,10 @@ if ($('#switch').is(':checked')) {
 		}
 		function chg() {
 			if ($('#switch').is(':checked')) {
-				Highcharts.chart('container', {
-					chart: {
-						plotBackgroundColor: null,
-						plotBorderWidth: null,
-						plotShadow: false,
-						type: 'pie'
-					},
-					title: {
-						text: 'Daily Performance'
-					},
-					tooltip: {
-						pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-					},
-					plotOptions: {
-						pie: {
-							allowPointSelect: true,
-							cursor: 'pointer',
-							dataLabels: {
-								enabled: true,
-								format: '<b>{point.name}</b>: {point.percentage:.1f} %',
-								style: {
-									color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
-								}
-							}
-						}
-					},
-					series: [{
-						name: 'Brands',
-						colorByPoint: true,
-						data: [{
-							name: 'Chrome',
-							y: 50,
-							sliced: true,
-							selected: true
-						}, {
-							name: 'Internet Explorer',
-							y: 20
-						}, {
-							name: 'Firefox',
-							y: 20
-						}, {
-							name: 'Edge',
-							y: 5
-						}, {
-							name: 'Safari',
-							y: 5
-						}]
-					}]
-				});
+				getChartData(1)
 			}
 			else{
-				getChartData();
+				getChartData(2);
 				// dailyCol();
 			}
 		}
@@ -99,9 +51,60 @@ if ($('#switch').is(':checked')) {
 	            }]
 	        });
 	    }
+	    function dailyPie() {
+	    	Highcharts.chart('container', {
+					chart: {
+						plotBackgroundColor: null,
+						plotBorderWidth: null,
+						plotShadow: false,
+						type: 'pie'
+					},
+					title: {
+						text: 'Daily Performance'
+					},
+					tooltip: {
+						pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+					},
+					plotOptions: {
+						pie: {
+							allowPointSelect: true,
+							cursor: 'pointer',
+							dataLabels: {
+								enabled: true,
+								format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+								style: {
+									color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+								}
+							}
+						}
+					},
+					series: [{
+						name: 'Brands',
+						colorByPoint: true,
+						data: [{
+							name: 'Day 1',
+							y: 50,
+							sliced: true,
+							selected: true
+						}, {
+							name: 'Internet Explorer',
+							y: 20
+						}, {
+							name: 'Firefox',
+							y: 20
+						}, {
+							name: 'Edge',
+							y: 5
+						}, {
+							name: 'Safari',
+							y: 5
+						}]
+					}]
+				});
+	    }
 
 
-		function dailyCol(a,date,achi,over) {
+		function dailyCol(work,date,achi,over) {
 			Highcharts.chart('container', {
 					chart: {
 						type: 'column'
@@ -136,26 +139,25 @@ if ($('#switch').is(':checked')) {
 					},
 					series: [{
 						name: 'Work Time',
-						data: a
+						data: work
 
 					}, {
 						name: 'Achievement',
-						data: [100,100]
+						data: achi
 
 					}, {
 						name: 'Over Time',
-						data: [3,3]
+						data: over
 
 					}]
 				});
 		}
 
 
-		function getChartData() {
-			var out_daily = [];
+		function getChartData(n) {
 			var work = [];
-			var achi = "";
-			var over = "";
+			var achi = [];
+			var over = [];
 			var date = [];
 			$.ajax({
 			type: "get",
@@ -163,19 +165,20 @@ if ($('#switch').is(':checked')) {
 			dataType: "json",
 			success: function (data) {
 			 for (i = 0; i < data.data.length; i++) {
-	               	// out_daily.push([data.data[i].date, data.data[i].work]);
+			 		var angkaw = parseInt(data.data[i].work);
+			 		var angkaa = parseInt(data.data[i].achievement);
+			 		var angkao = parseInt(data.data[i].over);
 	               	date.push([data.data[i].date]);
-	               // work.push([data.data[i].work]);
-	               	work+=data.data[i].work+',';
-	               	achi+='['+data.data[i].achievement+']';
-	               	over+='['+data.data[i].over+']';
-	               	// date+=data.data[i].date;
+	               	work.push([angkaw]);
+	               	achi.push([angkaa]);
+	               	over.push([angkao]);
 	           	}
 	           	workb = "["+work;
 	           	a = workb.replace(/,(\s+)?$/, '')+"]"; 
 	           	// var c = [a];
-	           	dailyCol(a,date,achi,over);
-	           	// console.log(c);
+	           	if (n==2) {dailyCol(work,date,achi,over)}else{dailyPie(work,date,achi,over)}
+	           	
+	           	console.log(work);
 	           }
 			});
 		}	
